@@ -5,6 +5,7 @@ Created on Thu Jun  2 15:38:29 2022
 @author: ZNDX002
 """
 
+import torch
 import dgl.function as fn
 from dgl.nn.functional import edge_softmax
 from dgllife.model.gnn.gcn import GCN
