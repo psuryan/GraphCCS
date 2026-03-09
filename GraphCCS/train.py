@@ -23,6 +23,7 @@ torch.manual_seed(2)
 np.random.seed(3)
 import copy
 from prettytable import PrettyTable
+from torch.utils.tensorboard import SummaryWriter
 from dataset import data_process_loader_Property,data_process_loader_Property_Prediction
 from model import GraphCCS
 from dataset import featurize_atoms,edit_adduct_mol
@@ -195,10 +196,12 @@ class Train():
 		table = PrettyTable(valid_metric_header)
 		float2str = lambda x:'%0.4f'%x
 
-		t_start = time() 
+		writer = SummaryWriter(log_dir=os.path.join(self.result_folder, 'runs'))
+		t_start = time()
 		loss_train=[]
 		loss_val=[]
 		num=[]
+		global_step = 0
 		for epo in range(train_epoch):
 			train_loss = 0
 			counter = 0
@@ -217,6 +220,8 @@ class Train():
 				opt.step()
 				train_loss += loss.item()
 				counter += 1
+				writer.add_scalar('train/loss_batch', loss.item(), global_step)
+				global_step += 1
 
 				if (i % 100 == 0):
 					t_now = time()
@@ -226,12 +231,17 @@ class Train():
 			num.append(epo + 1)
 			train_loss /= counter
 			loss_train.append(train_loss)
+			writer.add_scalar('train/loss_epoch', train_loss, epo)
+			writer.add_scalar('train/lr', opt.param_groups[0]['lr'], epo)
 
 			with torch.set_grad_enabled(False):
 				mse, r2, p_val, CI, logits = self.test_(validation_generator, model)
 				lst = ["epoch " + str(epo)] + list(map(float2str,[mse, r2, p_val, CI]))
 				valid_metric_record.append(lst)
 				loss_val.append(mse)
+				writer.add_scalar('val/loss', mse, epo)
+				writer.add_scalar('val/pearson_r', r2, epo)
+				writer.add_scalar('val/CI', CI, epo)
 				if mse < max_MSE:
 					model_max = copy.deepcopy(model)
 					max_MSE = mse
@@ -250,8 +260,12 @@ class Train():
 		mse, r2, p_val, CI, logits = self.test_(testing_generator, model_max)
 		test_table = PrettyTable(["MSE", "Pearson Correlation", "with p-value", "Concordance Index"])
 		test_table.add_row(list(map(float2str, [mse, r2, p_val, CI])))
-		print('Testing MSE: ' + str(mse) + ' , Pearson Correlation: ' + str(r2) 
+		print('Testing MSE: ' + str(mse) + ' , Pearson Correlation: ' + str(r2)
 			+ ' with p-value: ' + str(f"{p_val:.2E}") +' , Concordance Index: '+str(CI))
+		writer.add_scalar('test/loss', mse, 0)
+		writer.add_scalar('test/pearson_r', r2, 0)
+		writer.add_scalar('test/CI', CI, 0)
+		writer.close()
 		np.save(os.path.join(self.result_folder, str('DGL_GCN')+ '_logits.npy'), np.array(logits))                
 		prettytable_file = os.path.join(self.result_folder, "test_markdowntable.txt")
 		with open(prettytable_file, 'w') as fp:

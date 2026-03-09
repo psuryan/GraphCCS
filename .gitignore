@@ -11,15 +11,7 @@ __pycache__/
 *.ipynb
 
 # Training outputs
-*.npy
-*.pkl
-*.png
-loss_curve*
-valid_markdowntable.txt
-test_markdowntable.txt
-train.csv
-val.csv
-test.csv
+outputs/
 
 # Model weights (tracked separately via Git LFS or manually)
 # model/*.pt  # uncomment to ignore model files
