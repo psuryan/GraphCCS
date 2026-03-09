@@ -10,6 +10,9 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import r2_score, mean_absolute_error, median_absolute_error
 import matplotlib.pyplot as plt
+import os
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def train_test(dataset,seed):
     columns=dataset.columns
@@ -69,8 +72,9 @@ def test_plot(res,config):
     plt.show()
 
 def main():
-    config = yaml.load(open("/config/config.yaml", "r"), Loader=yaml.FullLoader)
-    dataset = pd.read_csv('/data/ccsbase_4_2.csv')
+    config = yaml.load(open(os.path.join(PROJECT_ROOT, 'config', 'config.yaml'), "r"), Loader=yaml.FullLoader)
+    config['result_folder'] = os.path.join(PROJECT_ROOT, config['result_folder'])
+    dataset = pd.read_csv(os.path.join(PROJECT_ROOT, 'data', 'ccsbase_4_2.csv'))
     smiles = np.array(list(dataset['SMI']))
     y = np.array(list(dataset['CCS']))
     add = np.array(list(dataset['Adduct']))
