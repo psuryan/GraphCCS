@@ -10,8 +10,11 @@ __pycache__/
 .ipynb_checkpoints/
 *.ipynb
 
+# Training inputs
+data/
 # Training outputs
 outputs/
+outputs_*/
 
 # Model weights (tracked separately via Git LFS or manually)
 # model/*.pt  # uncomment to ignore model files
