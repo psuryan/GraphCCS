@@ -22,6 +22,9 @@ outputs_*/
 # Data (large files)
 # data/       # uncomment to ignore data folder
 
+# Context / side notes
+context/
+
 # OS
 .DS_Store
 Thumbs.db

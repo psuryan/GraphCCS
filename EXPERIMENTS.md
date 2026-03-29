@@ -14,9 +14,55 @@
 
 ---
 
+## Script inventory
+
+### Canonical scripts (`scripts/`)
+| Script | Purpose |
+|--------|---------|
+| `scripts/run_experiment.py` | JSON-split training — `--data`, `--splits` (one or more), `--out`, `--seeds`. Single split → `out/seed_s/`; multiple splits → `out/label/seed_s/`. |
+| `scripts/run_analysis.py` | Post-hoc figures, tables, and CSVs. Three modes: `--mode lc` (multi-split LC), `--mode single` (one split, optional comparison overlay), `--mode error` (adduct/CCS-range/mol-property breakdown). |
+
+### Legacy scripts (`scripts/legacy/`)
+Kept verbatim for exact reproducibility of each past experiment.
+
+| Script | Experiment | Notes |
+|--------|-----------|-------|
+| `GraphCCS/run_exp1_oneoff.py` | Exp 1 | Was `run.py`. One-off on ccsbase_4_2.csv. |
+| `GraphCCS/run_exp2_presplit_csv.py` | Exp 2 | Was `run_baseline.py`. Pre-split CSVs, 5 seeds. |
+| `scripts/legacy/run_stats.py` | Exp 2 analysis | Summary stats from outputs_baseline/. |
+| `scripts/legacy/run_train_inference.py` | Exp 2 analysis | Train-set inference for outputs_baseline/. |
+| `scripts/legacy/run_learning_curve.py` | Exp 2/3 | Learning curve plots. |
+| `scripts/legacy/run_splits_experiment.py` | Exp 3 | Single-seed LC fractions. |
+| `scripts/legacy/run_splits_analysis.py` | Exp 3 analysis | Figures + corrected train metrics. |
+| `scripts/legacy/run_splits_multiseed.py` | Exp 4 | 5-seed LC fractions. |
+| `scripts/legacy/run_splits_multiseed_analysis.py` | Exp 4 analysis | Mean ± std LC figures. |
+| `scripts/legacy/run_scaffold_experiment.py` | Exp 5 | Scaffold split training. |
+| `scripts/legacy/run_scaffold_analysis.py` | Exp 5 analysis | Figures + scaffold vs random comparison. |
+| `scripts/legacy/run_adduct_sensitive_experiment.py` | Exp 6 | Adduct-sensitive split training. |
+| `scripts/legacy/run_adduct_sensitive_error_analysis.py` | Exp 6 analysis | Error breakdown by adduct, CCS range, mol properties. |
+| `scripts/legacy/run_comparison_scaffold.py` | Exp 5 comparison | GraphCCS vs Graph3D on scaffold split. |
+| `scripts/legacy/run_comparison_graph3D.py` | Exp 3/4 comparison | GraphCCS vs Graph3D on LC fractions. |
+
+### Data layout
+```
+data/
+  data.csv                          — 9209 rows, columns: index, smiles, adducts, label
+  splits/
+    random/split.json               — 7374 / 913 / 922  (train/val/test)
+    random_frac/split_0.1.json      — 737  / 913 / 922
+    random_frac/split_0.2.json      — 1474 / 913 / 922
+    random_frac/split_0.4.json      — 2949 / 913 / 922
+    random_frac/split_0.6.json      — 4424 / 913 / 922
+    random_frac/split_0.8.json      — 5899 / 913 / 922
+    scaffold/split.json             — 7369 / 920 / 920
+    adduct_sensitive/split.json     — 6446 / 1381 / 1382
+```
+
+---
+
 ## Experiment 1 — Original run (main branch)
 
-**Script**: `GraphCCS/run.py`
+**Script**: `GraphCCS/run_exp1_oneoff.py` *(legacy)*
 **Data**: `data/ccsbase_4_2.csv` — columns `SMI`, `CCS`, `Adduct`
 **Splits**: random 90/10 train/test then 90/10 train/val (seed hardcoded in train.py)
 **Output**: `outputs/`
@@ -27,7 +73,7 @@
 
 ## Experiment 2 — Baseline runs (baseline branch, 5 seeds)
 
-**Script**: `GraphCCS/run_baseline.py`
+**Script**: `GraphCCS/run_exp2_presplit_csv.py` *(legacy)*
 **Data**: pre-split CSVs — `data/data_train.csv` (8051), `data/data_val.csv` (1006), `data/data_test.csv` (1007)
 **Adducts**: `[M+H]+`, `[M-H]-`, `[M+Na]+` only
 **Column mapping**: `smiles_canon→SMILES`, `adducts→Adduct`, `label→Label`
@@ -74,18 +120,18 @@
 
 ### Scripts to regenerate figures (no retraining)
 ```bash
-python run_stats.py                  # prints tables + saves summary_errorbars.png
-python run_train_inference.py        # recomputes train_preds.csv + summary_errorbars_train.png
+python scripts/legacy/run_stats.py            # prints tables + saves summary_errorbars.png
+python scripts/legacy/run_train_inference.py  # recomputes train_preds.csv + summary_errorbars_train.png
 ```
 
 ---
 
 ## Experiment 3 — Learning curve by data fraction (JSON splits)
 
-**Script**: `run_splits_experiment.py`
-**Analysis script**: `run_splits_analysis.py` (post-hoc, no retraining needed)
-**Data**: `data/json_splits/json_splits/data.csv` (9209 rows; columns `smiles`, `adducts`, `label`)
-**Splits**: pre-defined JSON files in `data/json_splits/json_splits/`
+**Script**: `scripts/run_experiment.py` *(legacy: `scripts/legacy/run_splits_experiment.py`)*
+**Analysis script**: `scripts/run_analysis.py --mode lc --dir outputs_lc2` *(legacy: `scripts/legacy/run_splits_analysis.py`)*
+**Data**: `data/data.csv` (9209 rows; columns `smiles`, `adducts`, `label`)
+**Splits**: pre-defined JSON files in `data/splits/`
 
 | JSON file | Label | n_train | n_val | n_test |
 |-----------|-------|---------|-------|--------|
@@ -113,7 +159,7 @@ Val and test indices are **identical** across all splits. Seed=0 used for all.
 
 > **Note on train_RMSE at checkpoints**: computed correctly (per-batch MSE in eval mode).
 > `train_MeanPctDiff` was **removed** from this file — it was computed incorrectly
-> (shuffled loader vs original label order). Use `run_splits_analysis.py` for correct
+> (shuffled loader vs original label order). Use `scripts/run_analysis.py --mode lc` for correct
 > train Mean%Diff, which is computed only for the final (best-val) model.
 
 ### Final model results (best-val checkpoint)
@@ -146,32 +192,213 @@ Val and test indices are **identical** across all splits. Seed=0 used for all.
 
 ### To regenerate all figures (no retraining)
 ```bash
-python run_splits_analysis.py
+python scripts/run_analysis.py --mode lc --dir outputs_lc2 \
+  --labels frac_0.2 frac_0.4 frac_0.6 frac_0.8 full
 ```
-This loads each `model.pt`, runs sequential train inference, recomputes correct metrics,
-and saves all 4 figures. Typically takes ~10–15 min (graph calculation for each split).
 
-### To regenerate only the plots (if `test_at_epochs.csv` and `test.csv` are intact)
-The plot functions in `run_splits_analysis.py` read from saved CSVs and `.npy` files.
-Edit the `main()` function to skip the inference loop and call only the plot functions,
-or pass `--plot-only` after adding that flag.
+---
+
+## Experiment 4 — Multiseed learning curve (5 seeds × 6 fractions)
+
+**Script**: `scripts/run_experiment.py` *(legacy: `scripts/legacy/run_splits_multiseed.py`)*
+**Analysis script**: `scripts/run_analysis.py --mode lc --dir outputs_lc3` *(legacy: `scripts/legacy/run_splits_multiseed_analysis.py`)*
+**Data**: `data/data.csv` (same as Exp 3)
+**Splits**: same JSON files as Exp 3 plus `split_0.1.json`
+**Seeds**: 0–4 per split; seed only affects model init/training order (not data split)
+**Output**: `outputs_lc3/{split}/seed_{s}/`
+
+| JSON file | Label | n_train |
+|-----------|-------|---------|
+| `split_0.1.json` | `frac_0.1` | 737 |
+| `split_0.2.json` | `frac_0.2` | 1474 |
+| `split_0.4.json` | `frac_0.4` | 2949 |
+| `split_0.6.json` | `frac_0.6` | 4424 |
+| `split_0.8.json` | `frac_0.8` | 5899 |
+| `split.json`     | `full`     | 7374 |
+
+### Per-run files (`outputs_lc3/<split>/seed_<s>/`)
+| File | Contents |
+|------|----------|
+| `model.pt` | Best-val model weights |
+| `test.csv` | Test set with `predict` column |
+| `loss_train.npy` / `loss_val.npy` | Per-epoch losses (200 values each) |
+| `test_at_epochs.csv` | Test + train metrics at epochs 10/50/100/150/200 |
+| `checkpoints/epoch{e}_{train,test}.npy` | Raw (y_true, y_pred) at checkpoint epochs |
+| `checkpoints/epoch{e}_model.pt` | Model weights at checkpoint epochs |
+
+### Master CSV: `outputs_lc3/all_runs.csv`
+125 rows (6 fractions × 5 seeds × 5 checkpoint epochs). Columns: `split, seed, epoch, train_RMSE, train_MeanPctDiff, train_PearsonR, train_SpearmanR, train_KendallTau, test_RMSE, test_MeanPctDiff, test_PearsonR, test_SpearmanR, test_KendallTau, test_CI, generalization_gap`.
+
+### Test-set results at epoch 200 (mean ± std across 5 seeds, n_test=922)
+
+| Fraction | n_train | Test RMSE | Test Mean%Diff | Test Pearson R | Test Spearman R | Test Kendall τ |
+|----------|---------|-----------|----------------|----------------|-----------------|----------------|
+| 10% | 737 | 6.85 ± 0.20 | 2.60 ± 0.07% | 0.9921 ± 0.0005 | 0.9888 ± 0.0004 | 0.9135 ± 0.0014 |
+| 20% | 1474 | 6.16 ± 0.10 | 2.34 ± 0.04% | 0.9936 ± 0.0002 | 0.9910 ± 0.0003 | 0.9228 ± 0.0016 |
+| 40% | 2949 | 5.54 ± 0.08 | 2.06 ± 0.02% | 0.9948 ± 0.0001 | 0.9924 ± 0.0001 | 0.9308 ± 0.0006 |
+| 60% | 4424 | 5.20 ± 0.15 | 1.92 ± 0.05% | 0.9954 ± 0.0003 | 0.9931 ± 0.0003 | 0.9348 ± 0.0018 |
+| 80% | 5899 | 4.88 ± 0.05 | 1.78 ± 0.04% | 0.9960 ± 0.0000 | 0.9937 ± 0.0001 | 0.9391 ± 0.0007 |
+| 100% | 7374 | 4.82 ± 0.13 | 1.74 ± 0.06% | 0.9961 ± 0.0002 | 0.9939 ± 0.0004 | 0.9405 ± 0.0017 |
+
+### Summary figures (`outputs_lc3/`)
+| File | Contents |
+|------|----------|
+| `learning_curves.png` | Train + val MSE vs epoch, per fraction |
+| `generalization.png` | Train/test RMSE and gap at checkpoint epochs |
+| `test_vs_epoch.png` | Test Mean%Diff + Pearson R at checkpoints |
+| `final_model_comparison.png` | Bar chart: train vs test RMSE per fraction |
+| `lc_vs_fraction.png` / `lc_vs_fraction_final.png` | Test RMSE vs training set size |
+
+### To regenerate all figures (no retraining)
+```bash
+python scripts/run_analysis.py --mode lc --dir outputs_lc3 \
+  --labels frac_0.1 frac_0.2 frac_0.4 frac_0.6 frac_0.8 full \
+  --frac-map frac_0.1:0.1 frac_0.2:0.2 frac_0.4:0.4 frac_0.6:0.6 frac_0.8:0.8 full:1.0
+```
+
+---
+
+## Experiment 5 — Scaffold split (5 seeds)
+
+**Script**: `scripts/run_experiment.py` *(legacy: `scripts/legacy/run_scaffold_experiment.py`)*
+**Analysis script**: `scripts/run_analysis.py --mode single --dir outputs_scaffold --compare-dir outputs_lc3/full --compare-label "random (full)"` *(legacy: `scripts/legacy/run_scaffold_analysis.py`)*
+**Data**: `data/data.csv`
+**Split**: `data/splits/scaffold/split.json` — Bemis-Murcko scaffold split ensuring disjoint scaffolds between train and test
+**Seeds**: 0–4
+**Output**: `outputs_scaffold/seed_{s}/`
+
+### Per-run files (`outputs_scaffold/seed_<s>/`)
+Same structure as Exp 4 per-run files.
+
+### Master CSV: `outputs_scaffold/all_runs.csv`
+25 rows (1 split × 5 seeds × 5 epochs). Same columns as Exp 4.
+
+### Test-set results (best-val checkpoint, mean ± std across 5 seeds)
+
+| Metric | Value |
+|--------|-------|
+| Test RMSE | 6.40 ± 0.32 Å² |
+| Test Mean%Diff | 2.23 ± 0.14% |
+| Test Pearson R | 0.9924 ± 0.0007 |
+| Test Spearman R | 0.9909 ± 0.0005 |
+| Test Kendall τ | 0.9246 ± 0.0029 |
+| Train RMSE (epoch 200) | 2.80 ± 0.29 Å² |
+| Generalization gap | 3.60 ± 0.44 Å² |
+
+Per-seed test RMSE: seed 0 = 6.14, seed 1 = 6.23, seed 2 = 6.48, seed 3 = 6.22, seed 4 = 6.92.
+
+### Comparison: scaffold vs random (full split)
+
+| Split | Test RMSE | Test Mean%Diff | Test Pearson R |
+|-------|-----------|----------------|----------------|
+| Random (full, Exp 4) | 4.82 ± 0.13 | 1.74 ± 0.06% | 0.9961 ± 0.0002 |
+| Scaffold (Exp 5) | 6.40 ± 0.32 | 2.23 ± 0.14% | 0.9924 ± 0.0007 |
+| Scaffold penalty | +1.58 Å² | +0.49% | −0.0037 |
+
+### Summary figures (`outputs_scaffold/`)
+| File | Contents |
+|------|----------|
+| `learning_curves.png` | Train + val MSE vs epoch, per seed |
+| `generalization.png` | Train/test RMSE and gap at checkpoint epochs |
+| `test_vs_epoch.png` | Test Mean%Diff + Pearson R at checkpoints |
+| `scaffold_vs_random.png` | Paired comparison: scaffold vs random test RMSE |
+| `final_model_comparison.png` | Bar chart summary |
+
+---
+
+## Experiment 6 — Adduct-sensitive split (5 seeds)
+
+**Script**: `scripts/run_experiment.py` *(legacy: `scripts/legacy/run_adduct_sensitive_experiment.py`)*
+**Analysis script**: `scripts/run_analysis.py --mode single --dir outputs_adduct_sensitive` *(legacy: none — use `--mode error` for error breakdown)*
+**Data**: `data/data.csv`
+**Split**: `data/splits/adduct_sensitive/split.json`
+**Seeds**: 0–4
+**Output**: `outputs_adduct_sensitive/seed_{s}/`
+
+### Split design
+70:15:15 row ratio (6446 train / 1381 val / 1382 test). All single-adduct molecules go
+to train. Multi-adduct molecules sorted by CCS range ascending; lowest-range fill train,
+top ~50% (range ≥ 7.8 Å²) split alternately into val and test so both have matching avg
+CCS range (~14.2 Å²). Zero molecule overlap across sets.
+
+Val and test contain only multi-adduct molecules with large CCS range across adducts —
+molecules where adduct identity most changes the ion geometry. This is the primary
+benchmark for a 3D model's adduct-encoding advantage.
+
+### Test-set results (best-val checkpoint, mean ± std across 5 seeds)
+
+| Metric | Value |
+|--------|-------|
+| Test RMSE | 6.53 ± 0.15 Å² |
+| Test Mean%Diff | 2.49 ± 0.05% |
+| Test Pearson R | 0.9912 ± 0.0004 |
+| Test Spearman R | 0.9875 ± 0.0006 |
+| Test Kendall τ | 0.9105 ± 0.0023 |
+| Train RMSE (epoch 150) | 4.12 ± 0.16 Å² |
+| Generalization gap | 2.41 ± 0.36 Å² |
+
+Per-seed test RMSE: seed 0 = 6.51, seed 1 = 6.47, seed 2 = 6.81, seed 3 = 6.43, seed 4 = 6.41.
+
+### Three-way comparison (best-val checkpoint)
+
+| Metric | Random (Exp 4) | Scaffold (Exp 5) | Adduct-sensitive (Exp 6) |
+|--------|---------------|-----------------|--------------------------|
+| Test RMSE | 4.79 ± 0.07 | 6.40 ± 0.29 | **6.53 ± 0.15** |
+| Test Mean%Diff | 1.73 ± 0.04% | 2.23 ± 0.12% | **2.49 ± 0.05%** |
+| Test PearsonR | 0.9961 ± 0.0001 | 0.9924 ± 0.0006 | **0.9912 ± 0.0004** |
+| Test SpearmanR | 0.9940 ± 0.0002 | 0.9909 ± 0.0005 | **0.9875 ± 0.0006** |
+| Test KendallTau | 0.9406 ± 0.0012 | 0.9246 ± 0.0026 | **0.9105 ± 0.0023** |
+
+Adduct-sensitive is harder than scaffold on all metrics. Crucially, the generalization
+gap (2.41) is smaller than scaffold (3.60) — difficulty comes from the molecules
+themselves being harder, not scaffold OOD. Different axes of difficulty.
+
+### Error analysis (seed 0, `outputs_adduct_sensitive/seed_0/error_analysis/`)
+```bash
+python scripts/run_analysis.py --mode error \
+  --dir outputs_adduct_sensitive/seed_0 --data data/data.csv
+```
+*(legacy: `scripts/legacy/run_adduct_sensitive_error_analysis.py`)*
+
+**By adduct**: [M+Na]+ hardest (RMSE 7.20, bias −3.48 Å²) vs [M+H]+ easiest (5.75).
+  [M+Na]+ on Q2–Q3 mass (261–515 Da) is the hardest sub-group (RMSE 8.6).
+
+**By CCS range bucket**: RMSE scales monotonically with CCS range
+  (4.67 for range 7.8–10 → 19.5 for range 30+). Confirms split targets the right regime.
+
+**By molecular property**: Ring count correlates with error (5.56 for 1-ring → 7.04
+  for 4+ rings). Lipid-like easiest (5.53), peptide-like hardest (7.10). Mass shows
+  inverse relationship — lighter molecules harder (heavy molecules are mass-dominated).
+
+### CCS3D baseline files (`CCS3D/baseline_results/`)
+| File | Contents |
+|------|----------|
+| `graphccs_adduct_sensitive_summary.csv` | 5-seed mean ± std summary |
+| `graphccs_all_runs_adduct_sensitive.csv` | Per-seed per-epoch (25 rows) |
 
 ---
 
 ## Key observations across experiments
 
-1. **Baseline (Exp 2)**: Model trained on full data (8051 samples, 3 adducts) achieves
-   RMSE ~4.82 on held-out test, consistent across 5 seeds (low variance ±0.15).
+1. **Baseline (Exp 2)**: Full data (8051 samples) achieves RMSE 4.82 on held-out test,
+   consistent across 5 seeds (±0.15). [M+Na]+ slightly harder (4.97) vs [M+H]+ (4.69).
 
-2. **Data scaling (Exp 3)**: Test RMSE improves from 6.15 → 4.96 as training data grows
-   from 20% → 100% of available data. Gains diminish after 80%.
+2. **Data scaling (Exp 4)**: Test RMSE improves 6.85 → 4.82 as training data grows from
+   10% → 100%. Gains diminish after 60–80%; last 20% gives only ~0.06 Å² improvement.
 
-3. **Generalization gap**: Larger training sets allow tighter fitting of training data
-   (train RMSE drops from 5.82 → 3.03) while test RMSE plateaus (4.96 at full),
-   producing a growing gap. The model does not significantly overfit at small fractions.
+3. **Generalization gap (Exp 4)**: Gap grows with training set size as train RMSE falls
+   faster than test RMSE. At small fractions (10–20%) train ≈ test — model underfits.
 
-4. **Convergence**: Most of the test performance is achieved by epoch 100–150.
-   Epochs 150–200 give marginal further improvement.
+4. **Convergence**: Most test performance achieved by epoch 100–150. Epochs 150–200 give
+   marginal improvement (~0.1 Å²).
 
-5. **Adduct performance** (Exp 2): All three adduct types perform similarly.
-   [M+Na]+ is slightly harder (RMSE 4.97) vs [M+H]+ (4.69).
+5. **Scaffold penalty (Exp 5)**: Scaffold split degrades test RMSE by +1.58 Å² vs random
+   (full), confirming that random split inflates performance due to scaffold leakage.
+   The 3.60 Å² generalization gap (train 2.80 → test 6.40) is large relative to random
+   split gap (~1.9 Å²) — scaffold OOD is a harder, more realistic benchmark.
+
+6. **Adduct-sensitive split (Exp 6)**: Harder than scaffold on all metrics (RMSE 6.53 vs
+   6.40). Smaller generalization gap (2.41 vs 3.60) — difficulty is intrinsic to the
+   molecules, not OOD. [M+Na]+ on ring-containing mid-mass molecules is the hardest
+   regime, with systematic underprediction bias. This is the primary benchmark for 3D
+   model evaluation. Error analysis in `outputs_adduct_sensitive/error_analysis/`.

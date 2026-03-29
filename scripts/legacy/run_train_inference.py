@@ -8,7 +8,7 @@ on the TRAINING set. Report the same metrics as the test-set evaluation.
 import os
 import sys
 
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(PROJECT_ROOT, 'GraphCCS'))
 
 import numpy as np

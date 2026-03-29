@@ -11,7 +11,7 @@ Post-hoc analysis for outputs_lc2/:
 """
 
 import sys, os
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(PROJECT_ROOT, 'GraphCCS'))
 
 import json
@@ -30,17 +30,17 @@ from train import graph_calculation, dgl_collate_func
 from dataset import data_process_loader_Property
 import yaml
 
-SPLITS_DIR   = os.path.join(PROJECT_ROOT, 'data', 'json_splits', 'json_splits')
-DATA_CSV     = os.path.join(SPLITS_DIR, 'data.csv')
+DATA_CSV     = os.path.join(PROJECT_ROOT, 'data', 'data.csv')
+SPLITS_DIR   = os.path.join(PROJECT_ROOT, 'data', 'splits')
 OUT_ROOT     = os.path.join(PROJECT_ROOT, 'outputs_lc2')
 CHECK_EPOCHS = [10, 50, 100, 150, 200]
 
 SPLIT_FILES = [
-    ('frac_0.2', 'split_0.2.json'),
-    ('frac_0.4', 'split_0.4.json'),
-    ('frac_0.6', 'split_0.6.json'),
-    ('frac_0.8', 'split_0.8.json'),
-    ('full',     'split.json'),
+    ('frac_0.2', os.path.join('random_frac', 'split_0.2.json')),
+    ('frac_0.4', os.path.join('random_frac', 'split_0.4.json')),
+    ('frac_0.6', os.path.join('random_frac', 'split_0.6.json')),
+    ('frac_0.8', os.path.join('random_frac', 'split_0.8.json')),
+    ('full',     os.path.join('random',      'split.json')),
 ]
 
 
