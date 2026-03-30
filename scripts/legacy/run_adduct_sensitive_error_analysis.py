@@ -24,9 +24,9 @@ sys.path.insert(0, os.path.join(PROJECT_ROOT, 'GraphCCS'))
 from rdkit import Chem
 from rdkit.Chem import Descriptors, rdMolDescriptors
 
-TEST_CSV  = os.path.join(PROJECT_ROOT, 'outputs_adduct_sensitive', 'seed_0', 'test.csv')
+TEST_CSV  = os.path.join(PROJECT_ROOT, 'experiments', 'outputs_adduct_sensitive', 'seed_0', 'test.csv')
 DATA_CSV  = os.path.join(PROJECT_ROOT, 'data', 'data.csv')
-OUT_DIR   = os.path.join(PROJECT_ROOT, 'outputs_adduct_sensitive', 'error_analysis')
+OUT_DIR   = os.path.join(PROJECT_ROOT, 'experiments', 'outputs_adduct_sensitive', 'error_analysis')
 os.makedirs(OUT_DIR, exist_ok=True)
 
 

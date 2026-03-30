@@ -23,7 +23,7 @@ from scipy import stats
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OUT_DIR      = os.path.join(PROJECT_ROOT, 'comparison_graph3D')
-GCCS_SCAFFOLD_DIR = os.path.join(PROJECT_ROOT, 'outputs_scaffold')
+GCCS_SCAFFOLD_DIR = os.path.join(PROJECT_ROOT, 'experiments', 'outputs_scaffold')
 G3D_CSV      = os.path.join(OUT_DIR, 'scaffold_graph3D_results.csv')
 
 COLOR_GCCS = '#2196F3'

@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OUT_DIR      = os.path.join(PROJECT_ROOT, 'comparison_graph3D')
-GCCS_CSV     = os.path.join(PROJECT_ROOT, 'outputs_lc3', 'summary_epoch200.csv')
+GCCS_CSV     = os.path.join(PROJECT_ROOT, 'experiments', 'outputs_lc3', 'summary_epoch200.csv')
 G3D_CSV      = os.path.join(OUT_DIR, 'fraction_graph3D_runs.csv')
 
 FRACS        = [0.2, 0.4, 0.6, 0.8, 1.0]

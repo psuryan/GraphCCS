@@ -47,7 +47,7 @@ from dataset import data_process_loader_Property
 
 DATA_CSV   = os.path.join(PROJECT_ROOT, 'data', 'data.csv')
 SPLIT_JSON = os.path.join(PROJECT_ROOT, 'data', 'splits', 'adduct_sensitive', 'split.json')
-OUT_ROOT   = os.path.join(PROJECT_ROOT, 'outputs_adduct_sensitive')
+OUT_ROOT   = os.path.join(PROJECT_ROOT, 'experiments', 'outputs_adduct_sensitive')
 CHECK_EPOCHS = [10, 50, 100, 150, 200]
 SEEDS        = [0, 1, 2, 3, 4]
 

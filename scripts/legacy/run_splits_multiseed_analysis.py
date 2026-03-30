@@ -24,7 +24,7 @@ import pandas as pd
 import matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-OUT_ROOT     = os.path.join(PROJECT_ROOT, 'outputs_lc3')
+OUT_ROOT     = os.path.join(PROJECT_ROOT, 'experiments', 'outputs_lc3')
 CHECK_EPOCHS = [10, 50, 100, 150, 200]
 SEEDS        = [0, 1, 2, 3, 4]
 

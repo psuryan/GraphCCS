@@ -13,8 +13,7 @@ __pycache__/
 # Training inputs
 data/
 # Training outputs
-outputs/
-outputs_*/
+experiments/
 
 # Model weights (tracked separately via Git LFS or manually)
 # model/*.pt  # uncomment to ignore model files

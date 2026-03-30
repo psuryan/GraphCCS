@@ -29,8 +29,8 @@ Kept verbatim for exact reproducibility of each past experiment.
 |--------|-----------|-------|
 | `GraphCCS/run_exp1_oneoff.py` | Exp 1 | Was `run.py`. One-off on ccsbase_4_2.csv. |
 | `GraphCCS/run_exp2_presplit_csv.py` | Exp 2 | Was `run_baseline.py`. Pre-split CSVs, 5 seeds. |
-| `scripts/legacy/run_stats.py` | Exp 2 analysis | Summary stats from outputs_baseline/. |
-| `scripts/legacy/run_train_inference.py` | Exp 2 analysis | Train-set inference for outputs_baseline/. |
+| `scripts/legacy/run_stats.py` | Exp 2 analysis | Summary stats from experiments/outputs_baseline/. |
+| `scripts/legacy/run_train_inference.py` | Exp 2 analysis | Train-set inference for experiments/outputs_baseline/. |
 | `scripts/legacy/run_learning_curve.py` | Exp 2/3 | Learning curve plots. |
 | `scripts/legacy/run_splits_experiment.py` | Exp 3 | Single-seed LC fractions. |
 | `scripts/legacy/run_splits_analysis.py` | Exp 3 analysis | Figures + corrected train metrics. |
@@ -65,8 +65,8 @@ data/
 **Script**: `GraphCCS/run_exp1_oneoff.py` *(legacy)*
 **Data**: `data/ccsbase_4_2.csv` — columns `SMI`, `CCS`, `Adduct`
 **Splits**: random 90/10 train/test then 90/10 train/val (seed hardcoded in train.py)
-**Output**: `outputs/`
-**TensorBoard**: `outputs/runs/`
+**Output**: `experiments/outputs/`
+**TensorBoard**: `experiments/outputs/runs/`
 **Config**: `config/config.yaml` (200 epochs, 40 layers, hidden=400)
 
 ---
@@ -78,7 +78,7 @@ data/
 **Adducts**: `[M+H]+`, `[M-H]-`, `[M+Na]+` only
 **Column mapping**: `smiles_canon→SMILES`, `adducts→Adduct`, `label→Label`
 **Seeds**: 0–4, each run uses `set_seeds(seed)` covering random/numpy/torch/dgl/cudnn
-**Output**: `outputs_baseline/run_{0..4}/`
+**Output**: `experiments/outputs_baseline/run_{0..4}/`
 
 ### Per-run files
 | File | Contents |
@@ -92,7 +92,7 @@ data/
 | `runs/` | TensorBoard logs |
 | `train_preds.csv` | Train-set predictions from `run_train_inference.py` (post-hoc) |
 
-> **Note**: `run_0/` is an archived pre-seeded run; its `model.pt` lives at `outputs_baseline/model.pt` (root).
+> **Note**: `run_0/` is an archived pre-seeded run; its `model.pt` lives at `experiments/outputs_baseline/model.pt` (root).
 > Seeds 1–4 have full artifacts in their respective folders.
 
 ### Test-set results (mean ± std across 5 seeds, n=1007)
@@ -115,8 +115,8 @@ data/
 ### Summary figures
 | File | Contents |
 |------|----------|
-| `outputs_baseline/summary_errorbars.png` | Mean ± std test metrics across 5 seeds (bar chart) |
-| `outputs_baseline/summary_errorbars_train.png` | Same for train-set |
+| `experiments/outputs_baseline/summary_errorbars.png` | Mean ± std test metrics across 5 seeds (bar chart) |
+| `experiments/outputs_baseline/summary_errorbars_train.png` | Same for train-set |
 
 ### Scripts to regenerate figures (no retraining)
 ```bash
@@ -129,7 +129,7 @@ python scripts/legacy/run_train_inference.py  # recomputes train_preds.csv + sum
 ## Experiment 3 — Learning curve by data fraction (JSON splits)
 
 **Script**: `scripts/run_experiment.py` *(legacy: `scripts/legacy/run_splits_experiment.py`)*
-**Analysis script**: `scripts/run_analysis.py --mode lc --dir outputs_lc2` *(legacy: `scripts/legacy/run_splits_analysis.py`)*
+**Analysis script**: `scripts/run_analysis.py --mode lc --dir experiments/outputs_lc2` *(legacy: `scripts/legacy/run_splits_analysis.py`)*
 **Data**: `data/data.csv` (9209 rows; columns `smiles`, `adducts`, `label`)
 **Splits**: pre-defined JSON files in `data/splits/`
 
@@ -143,7 +143,7 @@ python scripts/legacy/run_train_inference.py  # recomputes train_preds.csv + sum
 
 Val and test indices are **identical** across all splits. Seed=0 used for all.
 
-### Per-split output files (`outputs_lc2/<label>/`)
+### Per-split output files (`experiments/outputs_lc2/<label>/`)
 | File | Contents |
 |------|----------|
 | `model.pt` | Best-val model weights |
@@ -182,7 +182,7 @@ Val and test indices are **identical** across all splits. Seed=0 used for all.
 | 80% | 6.96 | 6.65 | 5.80 | 5.03 | 4.97 | 4.98 |
 | full | 6.44 | 6.60 | 5.36 | 4.93 | 4.95 | 4.96 |
 
-### Summary figures (`outputs_lc2/`)
+### Summary figures (`experiments/outputs_lc2/`)
 | File | Contents |
 |------|----------|
 | `learning_curves.png` | Train MSE (batch) + Val MSE vs epoch, one line per fraction |
@@ -192,7 +192,7 @@ Val and test indices are **identical** across all splits. Seed=0 used for all.
 
 ### To regenerate all figures (no retraining)
 ```bash
-python scripts/run_analysis.py --mode lc --dir outputs_lc2 \
+python scripts/run_analysis.py --mode lc --dir experiments/outputs_lc2 \
   --labels frac_0.2 frac_0.4 frac_0.6 frac_0.8 full
 ```
 
@@ -201,11 +201,11 @@ python scripts/run_analysis.py --mode lc --dir outputs_lc2 \
 ## Experiment 4 — Multiseed learning curve (5 seeds × 6 fractions)
 
 **Script**: `scripts/run_experiment.py` *(legacy: `scripts/legacy/run_splits_multiseed.py`)*
-**Analysis script**: `scripts/run_analysis.py --mode lc --dir outputs_lc3` *(legacy: `scripts/legacy/run_splits_multiseed_analysis.py`)*
+**Analysis script**: `scripts/run_analysis.py --mode lc --dir experiments/outputs_lc3` *(legacy: `scripts/legacy/run_splits_multiseed_analysis.py`)*
 **Data**: `data/data.csv` (same as Exp 3)
 **Splits**: same JSON files as Exp 3 plus `split_0.1.json`
 **Seeds**: 0–4 per split; seed only affects model init/training order (not data split)
-**Output**: `outputs_lc3/{split}/seed_{s}/`
+**Output**: `experiments/outputs_lc3/{split}/seed_{s}/`
 
 | JSON file | Label | n_train |
 |-----------|-------|---------|
@@ -216,7 +216,7 @@ python scripts/run_analysis.py --mode lc --dir outputs_lc2 \
 | `split_0.8.json` | `frac_0.8` | 5899 |
 | `split.json`     | `full`     | 7374 |
 
-### Per-run files (`outputs_lc3/<split>/seed_<s>/`)
+### Per-run files (`experiments/outputs_lc3/<split>/seed_<s>/`)
 | File | Contents |
 |------|----------|
 | `model.pt` | Best-val model weights |
@@ -226,7 +226,7 @@ python scripts/run_analysis.py --mode lc --dir outputs_lc2 \
 | `checkpoints/epoch{e}_{train,test}.npy` | Raw (y_true, y_pred) at checkpoint epochs |
 | `checkpoints/epoch{e}_model.pt` | Model weights at checkpoint epochs |
 
-### Master CSV: `outputs_lc3/all_runs.csv`
+### Master CSV: `experiments/outputs_lc3/all_runs.csv`
 125 rows (6 fractions × 5 seeds × 5 checkpoint epochs). Columns: `split, seed, epoch, train_RMSE, train_MeanPctDiff, train_PearsonR, train_SpearmanR, train_KendallTau, test_RMSE, test_MeanPctDiff, test_PearsonR, test_SpearmanR, test_KendallTau, test_CI, generalization_gap`.
 
 ### Test-set results at epoch 200 (mean ± std across 5 seeds, n_test=922)
@@ -240,7 +240,7 @@ python scripts/run_analysis.py --mode lc --dir outputs_lc2 \
 | 80% | 5899 | 4.88 ± 0.05 | 1.78 ± 0.04% | 0.9960 ± 0.0000 | 0.9937 ± 0.0001 | 0.9391 ± 0.0007 |
 | 100% | 7374 | 4.82 ± 0.13 | 1.74 ± 0.06% | 0.9961 ± 0.0002 | 0.9939 ± 0.0004 | 0.9405 ± 0.0017 |
 
-### Summary figures (`outputs_lc3/`)
+### Summary figures (`experiments/outputs_lc3/`)
 | File | Contents |
 |------|----------|
 | `learning_curves.png` | Train + val MSE vs epoch, per fraction |
@@ -251,7 +251,7 @@ python scripts/run_analysis.py --mode lc --dir outputs_lc2 \
 
 ### To regenerate all figures (no retraining)
 ```bash
-python scripts/run_analysis.py --mode lc --dir outputs_lc3 \
+python scripts/run_analysis.py --mode lc --dir experiments/outputs_lc3 \
   --labels frac_0.1 frac_0.2 frac_0.4 frac_0.6 frac_0.8 full \
   --frac-map frac_0.1:0.1 frac_0.2:0.2 frac_0.4:0.4 frac_0.6:0.6 frac_0.8:0.8 full:1.0
 ```
@@ -261,16 +261,16 @@ python scripts/run_analysis.py --mode lc --dir outputs_lc3 \
 ## Experiment 5 — Scaffold split (5 seeds)
 
 **Script**: `scripts/run_experiment.py` *(legacy: `scripts/legacy/run_scaffold_experiment.py`)*
-**Analysis script**: `scripts/run_analysis.py --mode single --dir outputs_scaffold --compare-dir outputs_lc3/full --compare-label "random (full)"` *(legacy: `scripts/legacy/run_scaffold_analysis.py`)*
+**Analysis script**: `scripts/run_analysis.py --mode single --dir experiments/outputs_scaffold --compare-dir experiments/outputs_lc3/full --compare-label "random (full)"` *(legacy: `scripts/legacy/run_scaffold_analysis.py`)*
 **Data**: `data/data.csv`
 **Split**: `data/splits/scaffold/split.json` — Bemis-Murcko scaffold split ensuring disjoint scaffolds between train and test
 **Seeds**: 0–4
-**Output**: `outputs_scaffold/seed_{s}/`
+**Output**: `experiments/outputs_scaffold/seed_{s}/`
 
-### Per-run files (`outputs_scaffold/seed_<s>/`)
+### Per-run files (`experiments/outputs_scaffold/seed_<s>/`)
 Same structure as Exp 4 per-run files.
 
-### Master CSV: `outputs_scaffold/all_runs.csv`
+### Master CSV: `experiments/outputs_scaffold/all_runs.csv`
 25 rows (1 split × 5 seeds × 5 epochs). Same columns as Exp 4.
 
 ### Test-set results (best-val checkpoint, mean ± std across 5 seeds)
@@ -295,7 +295,7 @@ Per-seed test RMSE: seed 0 = 6.14, seed 1 = 6.23, seed 2 = 6.48, seed 3 = 6.22, 
 | Scaffold (Exp 5) | 6.40 ± 0.32 | 2.23 ± 0.14% | 0.9924 ± 0.0007 |
 | Scaffold penalty | +1.58 Å² | +0.49% | −0.0037 |
 
-### Summary figures (`outputs_scaffold/`)
+### Summary figures (`experiments/outputs_scaffold/`)
 | File | Contents |
 |------|----------|
 | `learning_curves.png` | Train + val MSE vs epoch, per seed |
@@ -309,11 +309,11 @@ Per-seed test RMSE: seed 0 = 6.14, seed 1 = 6.23, seed 2 = 6.48, seed 3 = 6.22, 
 ## Experiment 6 — Adduct-sensitive split (5 seeds)
 
 **Script**: `scripts/run_experiment.py` *(legacy: `scripts/legacy/run_adduct_sensitive_experiment.py`)*
-**Analysis script**: `scripts/run_analysis.py --mode single --dir outputs_adduct_sensitive` *(legacy: none — use `--mode error` for error breakdown)*
+**Analysis script**: `scripts/run_analysis.py --mode single --dir experiments/outputs_adduct_sensitive` *(legacy: none — use `--mode error` for error breakdown)*
 **Data**: `data/data.csv`
 **Split**: `data/splits/adduct_sensitive/split.json`
 **Seeds**: 0–4
-**Output**: `outputs_adduct_sensitive/seed_{s}/`
+**Output**: `experiments/outputs_adduct_sensitive/seed_{s}/`
 
 ### Split design
 70:15:15 row ratio (6446 train / 1381 val / 1382 test). All single-adduct molecules go
@@ -353,10 +353,10 @@ Adduct-sensitive is harder than scaffold on all metrics. Crucially, the generali
 gap (2.41) is smaller than scaffold (3.60) — difficulty comes from the molecules
 themselves being harder, not scaffold OOD. Different axes of difficulty.
 
-### Error analysis (seed 0, `outputs_adduct_sensitive/seed_0/error_analysis/`)
+### Error analysis (seed 0, `experiments/outputs_adduct_sensitive/seed_0/error_analysis/`)
 ```bash
 python scripts/run_analysis.py --mode error \
-  --dir outputs_adduct_sensitive/seed_0 --data data/data.csv
+  --dir experiments/outputs_adduct_sensitive/seed_0 --data data/data.csv
 ```
 *(legacy: `scripts/legacy/run_adduct_sensitive_error_analysis.py`)*
 
@@ -401,4 +401,4 @@ python scripts/run_analysis.py --mode error \
    6.40). Smaller generalization gap (2.41 vs 3.60) — difficulty is intrinsic to the
    molecules, not OOD. [M+Na]+ on ring-containing mid-mass molecules is the hardest
    regime, with systematic underprediction bias. This is the primary benchmark for 3D
-   model evaluation. Error analysis in `outputs_adduct_sensitive/error_analysis/`.
+   model evaluation. Error analysis in `experiments/outputs_adduct_sensitive/error_analysis/`.

@@ -25,8 +25,8 @@ import matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 
-OUT_ROOT     = os.path.join(PROJECT_ROOT, 'outputs_scaffold')
-OUT_RANDOM   = os.path.join(PROJECT_ROOT, 'outputs_lc3', 'full')   # random full split
+OUT_ROOT     = os.path.join(PROJECT_ROOT, 'experiments', 'outputs_scaffold')
+OUT_RANDOM   = os.path.join(PROJECT_ROOT, 'experiments', 'outputs_lc3', 'full')   # random full split
 CHECK_EPOCHS = [10, 50, 100, 150, 200]
 SEEDS        = [0, 1, 2, 3, 4]
 

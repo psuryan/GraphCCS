@@ -36,7 +36,7 @@ def run_stats(df):
 # Load all 5 baseline runs
 runs = {}
 for seed in range(5):
-    path = os.path.join(PROJECT_ROOT, "outputs_baseline", f"run_{seed}", "test.csv")
+    path = os.path.join(PROJECT_ROOT, "experiments", "outputs_baseline", f"run_{seed}", "test.csv")
     runs[f"seed_{seed}"] = load_run(path)
     print(f"Loaded seed={seed}: {len(runs[f'seed_{seed}'])} test samples")
 
@@ -108,7 +108,7 @@ for ax, metric in zip(axes, METRICS):
 
 fig.suptitle("GraphCCS Baseline — 5-seed summary (mean ± std)", fontsize=13, fontweight="bold")
 plt.tight_layout()
-out_path = os.path.join(PROJECT_ROOT, "outputs_baseline", "summary_errorbars.png")
+out_path = os.path.join(PROJECT_ROOT, "experiments", "outputs_baseline", "summary_errorbars.png")
 plt.savefig(out_path, dpi=150, bbox_inches="tight")
 plt.close()
 print(f"Figure saved to {out_path}")

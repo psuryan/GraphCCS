@@ -277,7 +277,7 @@ class TrainWithCheckpoints:
 # ── single fraction run ───────────────────────────────────────────────────────
 
 def run_one(frac, train_full, val, test, config_base):
-    out_dir = os.path.join(PROJECT_ROOT, 'outputs_lc', f'frac_{frac}')
+    out_dir = os.path.join(PROJECT_ROOT, 'experiments', 'outputs_lc', f'frac_{frac}')
     os.makedirs(out_dir, exist_ok=True)
 
     set_seeds(SEED)
@@ -303,7 +303,7 @@ def plot_learning_curves(fracs):
     colors = plt.cm.viridis(np.linspace(0.15, 0.85, len(fracs)))
 
     for frac, color in zip(fracs, colors):
-        out_dir    = os.path.join(PROJECT_ROOT, 'outputs_lc', f'frac_{frac}')
+        out_dir    = os.path.join(PROJECT_ROOT, 'experiments', 'outputs_lc', f'frac_{frac}')
         val_path   = os.path.join(out_dir, 'loss_val.npy')
         train_path = os.path.join(out_dir, 'loss_train.npy')
         if not os.path.exists(val_path):
@@ -329,7 +329,7 @@ def plot_learning_curves(fracs):
         f'GraphCCS — learning curves by training-data fraction  (seed={SEED})',
         fontsize=13, fontweight='bold')
     plt.tight_layout()
-    out_path = os.path.join(PROJECT_ROOT, 'outputs_lc', 'learning_curves.png')
+    out_path = os.path.join(PROJECT_ROOT, 'experiments', 'outputs_lc', 'learning_curves.png')
     plt.savefig(out_path, dpi=150, bbox_inches='tight')
     plt.close()
     print(f'Learning-curve figure saved to {out_path}')
@@ -344,7 +344,7 @@ def plot_test_vs_epoch(fracs):
     markers  = ['o', 's', '^', 'D']
 
     for frac, color, marker in zip(fracs, colors, markers):
-        out_dir  = os.path.join(PROJECT_ROOT, 'outputs_lc', f'frac_{frac}')
+        out_dir  = os.path.join(PROJECT_ROOT, 'experiments', 'outputs_lc', f'frac_{frac}')
         ckpt_csv = os.path.join(out_dir, 'test_at_epochs.csv')
         if not os.path.exists(ckpt_csv):
             print(f'WARNING: {ckpt_csv} not found, skipping frac={frac}')
@@ -368,7 +368,7 @@ def plot_test_vs_epoch(fracs):
         f'GraphCCS — test-set metrics at checkpoint epochs  (seed={SEED})',
         fontsize=13, fontweight='bold')
     plt.tight_layout()
-    out_path = os.path.join(PROJECT_ROOT, 'outputs_lc', 'test_vs_epoch.png')
+    out_path = os.path.join(PROJECT_ROOT, 'experiments', 'outputs_lc', 'test_vs_epoch.png')
     plt.savefig(out_path, dpi=150, bbox_inches='tight')
     plt.close()
     print(f'Test-vs-epoch figure saved to {out_path}')
@@ -389,7 +389,7 @@ def main():
         open(os.path.join(PROJECT_ROOT, 'config', 'config.yaml'), 'r'),
         Loader=yaml.FullLoader)
 
-    os.makedirs(os.path.join(PROJECT_ROOT, 'outputs_lc'), exist_ok=True)
+    os.makedirs(os.path.join(PROJECT_ROOT, 'experiments', 'outputs_lc'), exist_ok=True)
 
     if not args.plot_only:
         train_full = load_split(os.path.join(PROJECT_ROOT, 'data', 'data_train.csv'))

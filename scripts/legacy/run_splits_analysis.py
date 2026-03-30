@@ -32,7 +32,7 @@ import yaml
 
 DATA_CSV     = os.path.join(PROJECT_ROOT, 'data', 'data.csv')
 SPLITS_DIR   = os.path.join(PROJECT_ROOT, 'data', 'splits')
-OUT_ROOT     = os.path.join(PROJECT_ROOT, 'outputs_lc2')
+OUT_ROOT     = os.path.join(PROJECT_ROOT, 'experiments', 'outputs_lc2')
 CHECK_EPOCHS = [10, 50, 100, 150, 200]
 
 SPLIT_FILES = [
