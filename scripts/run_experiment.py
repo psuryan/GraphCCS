@@ -141,9 +141,10 @@ class TrainWithCheckpoints:
         loss_fct = torch.nn.MSELoss()
         BS, NW   = cfg['batch_size'], cfg['num_workers']
 
-        train_g = graph_calculation(self.train.copy())
-        val_g   = graph_calculation(self.val.copy())
-        test_g  = graph_calculation(self.test.copy())
+        ablate_3d = cfg.get('ablate_3d', False)
+        train_g = graph_calculation(self.train.copy(), ablate_3d=ablate_3d)
+        val_g   = graph_calculation(self.val.copy(),   ablate_3d=ablate_3d)
+        test_g  = graph_calculation(self.test.copy(),  ablate_3d=ablate_3d)
 
         def make_loader(g, shuffle, sampler=None):
             ds = data_process_loader_Property(g.index.values, g.Label.values, g)
@@ -295,6 +296,8 @@ def main():
     parser.add_argument('--seeds',  nargs='+', type=int, default=DEFAULT_SEEDS)
     parser.add_argument('--check-epochs', nargs='+', type=int,
                         default=DEFAULT_CHECK_EPOCHS)
+    parser.add_argument('--ablate-3d', action='store_true',
+                        help='Zero out 3D-derived atom features (CripperLogP, MolarRefrac, ASA, TPSA)')
     args = parser.parse_args()
 
     multi = len(args.splits) > 1
@@ -331,6 +334,7 @@ def main():
             set_seeds(seed)
             cfg = dict(config)
             cfg['result_folder'] = out_dir + '/'
+            cfg['ablate_3d'] = args.ablate_3d
             TrainWithCheckpoints(train, val, test,
                                  check_epochs=args.check_epochs, **cfg).train_()
 

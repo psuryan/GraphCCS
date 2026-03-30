@@ -145,7 +145,7 @@ def atom_to_feature(atom,mol):
     atom_features2 = list(atom_features2.squeeze(-2))
     return np.concatenate((atom_features1,atom_features2),-1)
 
-def featurize_atoms(mol):
+def featurize_atoms(mol, ablate_3d=False):
     """A featurizer for atoms.
     Parameters
     ----------
@@ -219,6 +219,8 @@ def featurize_atoms(mol):
         feature.append(atom_to_feature(atom,mol))
     feature = np.array(feature).reshape(-1,150)
     feature = torch.tensor(feature)
+    if ablate_3d:
+        feature[:, 146:150] = 0.0  # zero CripperLogP, MolarRefrac, asa, tpsa
     #feature[:,-7] = feature[torch.randperm(feature.size(0)),-7]
     return {'h': feature.float()}
 

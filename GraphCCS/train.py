@@ -66,9 +66,9 @@ class BondFeaturizer(BaseBondFeaturizer):
                  bond_direction_one_hot]
             )}, self_loop=self_loop)
 
-def graph_calculation(df):
+def graph_calculation(df, ablate_3d=False):
     print("calculating molecular graphs")
-    node_featurizer = featurize_atoms
+    node_featurizer = partial(featurize_atoms, ablate_3d=ablate_3d)
     edge_featurizer = BondFeaturizer(bond_data_field='e', self_loop=True)
     fc = partial(mol_to_bigraph, add_self_loop=True)
     df['Graph'] = ''

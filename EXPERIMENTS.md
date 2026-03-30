@@ -378,6 +378,55 @@ python scripts/run_analysis.py --mode error \
 
 ---
 
+## Experiment 7 — 3D-feature ablation on adduct-sensitive split (5 seeds)
+
+**Branch**: `ablate-3d`
+**Script**: `scripts/run_experiment.py --ablate-3d`
+**Data**: `data/data.csv`
+**Split**: `data/splits/adduct_sensitive/split.json`
+**Seeds**: 0–4
+**Output**: `experiments/outputs_ablate3d_adduct_sensitive/seed_{s}/`
+
+### What is ablated
+Atom feature indices 146–149 (the last 4 of the 150-dim vector) are zeroed:
+- Index 146: CripperLogP (per-atom Crippen contribution)
+- Index 147: MolarRefrac (per-atom molar refractivity)
+- Index 148: Labute ASA (per-atom accessible surface area)
+- Index 149: TPSA (per-atom topological polar surface area)
+
+These are computed by RDKit using parameters derived from 3D structural data, even though
+they are evaluated on 2D SMILES at inference. Feature vector dimensionality (150) is
+unchanged — zeroing rather than removing keeps the model architecture identical.
+
+### How to reproduce
+```bash
+python scripts/run_experiment.py \
+  --data data/data.csv \
+  --splits data/splits/adduct_sensitive/split.json \
+  --out experiments/outputs_ablate3d_adduct_sensitive \
+  --seeds 0 1 2 3 4 \
+  --ablate-3d
+```
+
+### Test-set results (epoch 200, mean ± std across 5 seeds)
+
+| Metric | Full features (Exp 6) | Ablated (Exp 7) | Δ |
+|--------|----------------------|-----------------|---|
+| Test RMSE | 6.53 ± 0.15 Å² | **6.95 ± 0.15 Å²** | +0.42 |
+| Test Mean%Diff | 2.49 ± 0.05% | **2.57 ± 0.06%** | +0.08% |
+| Test Pearson R | 0.9912 ± 0.0004 | **0.9906 ± 0.0003** | −0.0006 |
+
+Per-seed test RMSE: seed 0 = 6.79, seed 1 = 6.82, seed 2 = 6.90, seed 3 = 7.12, seed 4 = 7.14.
+
+### Interpretation
+Removing the 3D-parameterized features degrades RMSE by +0.42 Å² (~6.4% relative).
+The effect is consistent across all 5 seeds. This establishes a lower bound for GraphCCS
+performance without any 3D-derived information, useful as a reference when evaluating
+whether CCS3D's 3D conformer features provide additional lift beyond what RDKit's
+3D-parameterized 2D descriptors already capture.
+
+---
+
 ## Key observations across experiments
 
 1. **Baseline (Exp 2)**: Full data (8051 samples) achieves RMSE 4.82 on held-out test,
@@ -402,3 +451,8 @@ python scripts/run_analysis.py --mode error \
    molecules, not OOD. [M+Na]+ on ring-containing mid-mass molecules is the hardest
    regime, with systematic underprediction bias. This is the primary benchmark for 3D
    model evaluation. Error analysis in `experiments/outputs_adduct_sensitive/error_analysis/`.
+
+7. **3D-feature ablation (Exp 7)**: Removing CripperLogP, MolarRefrac, ASA, and TPSA
+   (atom feature indices 146–149) degrades adduct-sensitive test RMSE by +0.42 Å²
+   (6.53 → 6.95, ~6.4% relative). Confirms 3D-parameterized features contribute
+   meaningfully. Useful lower bound for CCS3D comparison.
