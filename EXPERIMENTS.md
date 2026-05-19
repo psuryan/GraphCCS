@@ -468,6 +468,128 @@ Figures: `experiments/split_comparison.png`, `experiments/split_comparison_table
 
 ---
 
+## External Test Set Results
+
+**Models**: Random split (Exp 4, full), Scaffold split (Exp 5), Adduct-sensitive split (Exp 6)
+**Checkpoint**: `model.pt` (best-val) for each seed — selected by minimum validation loss
+**Script**: `scripts/run_external_eval.py` *(to be written)*
+
+### External test sets
+
+| Set | File | n |
+|-----|------|---|
+| testset_1 | `data/external_sets/testset_1.csv` | 1163 |
+| testset_2 | `data/external_sets/testset_2.csv` | 49 |
+| testset_3 | `data/external_sets/testset_3.csv` | 298 |
+| testset_4 | `data/external_sets/testset_4.csv` | 20 |
+
+### Notes
+- Train metrics from `test_at_epochs.csv` at the checkpoint epoch nearest to the best-val epoch (identified from `loss_val.npy`). Exact epoch noted per row.
+- mean±std rows use population std (ddof=0), consistent with all other experiments.
+- Full results also saved to `experiments/external_eval_results.csv`.
+
+---
+
+### Testset 1 (n=1163)
+
+| Split | Seed | Ckpt | Train RMSE | Train Mean%Diff | Train Pearson R | Train Spearman R | Train Kendall τ | Ext RMSE | Ext Mean%Diff | Ext Pearson R | Ext Spearman R | Ext Kendall τ |
+|-------|------|------|-----------|-----------------|-----------------|------------------|-----------------|----------|---------------|--------------|---------------|--------------|
+| Random | 0 | `experiments/outputs_lc3/full/seed_0/model.pt` (best-val ep≈158, ckpt ep150) | 3.406 | 1.254 | 0.9980 | 0.9974 | 0.9592 | 5.821 | 2.424 | 0.9830 | 0.9818 | 0.8877 |
+| Random | 1 | `experiments/outputs_lc3/full/seed_1/model.pt` (best-val ep≈183, ckpt ep200) | 2.939 | 1.010 | 0.9985 | 0.9981 | 0.9658 | 5.504 | 2.319 | 0.9848 | 0.9839 | 0.8936 |
+| Random | 2 | `experiments/outputs_lc3/full/seed_2/model.pt` (best-val ep≈153, ckpt ep150) | 4.121 | 1.427 | 0.9970 | 0.9962 | 0.9521 | 5.398 | 2.260 | 0.9856 | 0.9843 | 0.8959 |
+| Random | 3 | `experiments/outputs_lc3/full/seed_3/model.pt` (best-val ep≈199, ckpt ep200) | 3.130 | 1.096 | 0.9984 | 0.9979 | 0.9642 | 5.759 | 2.345 | 0.9830 | 0.9839 | 0.8931 |
+| Random | 4 | `experiments/outputs_lc3/full/seed_4/model.pt` (best-val ep≈185, ckpt ep200) | 2.837 | 0.961 | 0.9986 | 0.9982 | 0.9671 | 5.619 | 2.400 | 0.9838 | 0.9823 | 0.8896 |
+| **Random** | **mean±std** | | **3.287±0.460** | **1.150±0.171** | **0.9981±0.0006** | **0.9976±0.0007** | **0.9617±0.0055** | **5.620±0.156** | **2.350±0.058** | **0.9840±0.0010** | **0.9832±0.0010** | **0.8920±0.0029** |
+| Scaffold | 0 | `experiments/outputs_scaffold/seed_0/model.pt` (best-val ep≈132, ckpt ep150) | 3.270 | 1.151 | 0.9983 | 0.9977 | 0.9624 | 5.687 | 2.269 | 0.9842 | 0.9851 | 0.8985 |
+| Scaffold | 1 | `experiments/outputs_scaffold/seed_1/model.pt` (best-val ep≈151, ckpt ep150) | 3.803 | 1.362 | 0.9976 | 0.9966 | 0.9553 | 5.188 | 2.212 | 0.9862 | 0.9855 | 0.8994 |
+| Scaffold | 2 | `experiments/outputs_scaffold/seed_2/model.pt` (best-val ep≈112, ckpt ep100) | 5.447 | 1.827 | 0.9954 | 0.9949 | 0.9479 | 5.602 | 2.393 | 0.9843 | 0.9830 | 0.8910 |
+| Scaffold | 3 | `experiments/outputs_scaffold/seed_3/model.pt` (best-val ep≈194, ckpt ep200) | 2.695 | 0.952 | 0.9988 | 0.9985 | 0.9692 | 5.917 | 2.467 | 0.9820 | 0.9819 | 0.8866 |
+| Scaffold | 4 | `experiments/outputs_scaffold/seed_4/model.pt` (best-val ep≈129, ckpt ep150) | 4.004 | 1.495 | 0.9975 | 0.9966 | 0.9534 | 5.631 | 2.427 | 0.9840 | 0.9824 | 0.8900 |
+| **Scaffold** | **mean±std** | | **3.844±0.922** | **1.357±0.299** | **0.9975±0.0012** | **0.9969±0.0012** | **0.9576±0.0074** | **5.605±0.236** | **2.354±0.097** | **0.9841±0.0013** | **0.9836±0.0015** | **0.8931±0.0050** |
+| Adduct-sens | 0 | `experiments/outputs_adduct_sensitive/seed_0/model.pt` (best-val ep≈149, ckpt ep150) | 4.749 | 1.503 | 0.9964 | 0.9959 | 0.9536 | 5.447 | 2.206 | 0.9847 | 0.9856 | 0.8993 |
+| Adduct-sens | 1 | `experiments/outputs_adduct_sensitive/seed_1/model.pt` (best-val ep≈134, ckpt ep150) | 3.688 | 1.244 | 0.9978 | 0.9971 | 0.9588 | 5.416 | 2.289 | 0.9849 | 0.9833 | 0.8928 |
+| Adduct-sens | 2 | `experiments/outputs_adduct_sensitive/seed_2/model.pt` (best-val ep≈150, ckpt ep150) | 4.382 | 1.422 | 0.9969 | 0.9964 | 0.9563 | 5.466 | 2.253 | 0.9847 | 0.9836 | 0.8940 |
+| Adduct-sens | 3 | `experiments/outputs_adduct_sensitive/seed_3/model.pt` (best-val ep≈138, ckpt ep150) | 3.749 | 1.342 | 0.9978 | 0.9972 | 0.9575 | 5.627 | 2.340 | 0.9839 | 0.9826 | 0.8901 |
+| Adduct-sens | 4 | `experiments/outputs_adduct_sensitive/seed_4/model.pt` (best-val ep≈155, ckpt ep150) | 4.017 | 1.354 | 0.9974 | 0.9968 | 0.9556 | 5.565 | 2.310 | 0.9842 | 0.9847 | 0.8961 |
+| **Adduct-sens** | **mean±std** | | **4.117±0.400** | **1.373±0.086** | **0.9973±0.0005** | **0.9967±0.0005** | **0.9564±0.0018** | **5.504±0.079** | **2.280±0.046** | **0.9845±0.0004** | **0.9840±0.0011** | **0.8945±0.0031** |
+
+---
+
+### Testset 2 (n=49)
+
+| Split | Seed | Ckpt | Train RMSE | Train Mean%Diff | Train Pearson R | Train Spearman R | Train Kendall τ | Ext RMSE | Ext Mean%Diff | Ext Pearson R | Ext Spearman R | Ext Kendall τ |
+|-------|------|------|-----------|-----------------|-----------------|------------------|-----------------|----------|---------------|--------------|---------------|--------------|
+| Random | 0 | `experiments/outputs_lc3/full/seed_0/model.pt` | 3.406 | 1.254 | 0.9980 | 0.9974 | 0.9592 | 13.336 | 3.636 | 0.9704 | 0.6714 | 0.4981 |
+| Random | 1 | `experiments/outputs_lc3/full/seed_1/model.pt` | 2.939 | 1.010 | 0.9985 | 0.9981 | 0.9658 | 10.382 | 3.117 | 0.9828 | 0.7443 | 0.5696 |
+| Random | 2 | `experiments/outputs_lc3/full/seed_2/model.pt` | 4.121 | 1.427 | 0.9970 | 0.9962 | 0.9521 | 10.235 | 3.109 | 0.9840 | 0.7683 | 0.5986 |
+| Random | 3 | `experiments/outputs_lc3/full/seed_3/model.pt` | 3.130 | 1.096 | 0.9984 | 0.9979 | 0.9642 | 11.242 | 3.296 | 0.9800 | 0.6729 | 0.4811 |
+| Random | 4 | `experiments/outputs_lc3/full/seed_4/model.pt` | 2.837 | 0.961 | 0.9986 | 0.9982 | 0.9671 | 12.001 | 3.794 | 0.9791 | 0.6880 | 0.5236 |
+| **Random** | **mean±std** | | **3.287±0.460** | **1.150±0.171** | **0.9981±0.0006** | **0.9976±0.0007** | **0.9617±0.0055** | **11.439±1.142** | **3.390±0.278** | **0.9793±0.0048** | **0.7090±0.0398** | **0.5342±0.0439** |
+| Scaffold | 0 | `experiments/outputs_scaffold/seed_0/model.pt` | 3.270 | 1.151 | 0.9983 | 0.9977 | 0.9624 | 19.183 | 5.971 | 0.9596 | 0.5289 | 0.3448 |
+| Scaffold | 1 | `experiments/outputs_scaffold/seed_1/model.pt` | 3.803 | 1.362 | 0.9976 | 0.9966 | 0.9553 | 14.507 | 4.617 | 0.9753 | 0.6489 | 0.4708 |
+| Scaffold | 2 | `experiments/outputs_scaffold/seed_2/model.pt` | 5.447 | 1.827 | 0.9954 | 0.9949 | 0.9479 | 11.159 | 3.290 | 0.9803 | 0.7539 | 0.5832 |
+| Scaffold | 3 | `experiments/outputs_scaffold/seed_3/model.pt` | 2.695 | 0.952 | 0.9988 | 0.9985 | 0.9692 | 13.652 | 4.182 | 0.9748 | 0.6507 | 0.4725 |
+| Scaffold | 4 | `experiments/outputs_scaffold/seed_4/model.pt` | 4.004 | 1.495 | 0.9975 | 0.9966 | 0.9534 | 11.669 | 3.636 | 0.9811 | 0.7018 | 0.5202 |
+| **Scaffold** | **mean±std** | | **3.844±0.922** | **1.357±0.299** | **0.9975±0.0012** | **0.9969±0.0012** | **0.9576±0.0074** | **14.034±2.854** | **4.339±0.934** | **0.9742±0.0077** | **0.6568±0.0747** | **0.4783±0.0783** |
+| Adduct-sens | 0 | `experiments/outputs_adduct_sensitive/seed_0/model.pt` | 4.749 | 1.503 | 0.9964 | 0.9959 | 0.9536 | 11.429 | 3.630 | 0.9829 | 0.7695 | 0.5934 |
+| Adduct-sens | 1 | `experiments/outputs_adduct_sensitive/seed_1/model.pt` | 3.688 | 1.244 | 0.9978 | 0.9971 | 0.9588 | 11.272 | 3.562 | 0.9833 | 0.6613 | 0.4794 |
+| Adduct-sens | 2 | `experiments/outputs_adduct_sensitive/seed_2/model.pt` | 4.382 | 1.422 | 0.9969 | 0.9964 | 0.9563 | 15.440 | 4.731 | 0.9822 | 0.7362 | 0.5611 |
+| Adduct-sens | 3 | `experiments/outputs_adduct_sensitive/seed_3/model.pt` | 3.749 | 1.342 | 0.9978 | 0.9972 | 0.9575 | 12.858 | 3.913 | 0.9800 | 0.7185 | 0.5441 |
+| Adduct-sens | 4 | `experiments/outputs_adduct_sensitive/seed_4/model.pt` | 4.017 | 1.354 | 0.9974 | 0.9968 | 0.9556 | 11.365 | 3.658 | 0.9807 | 0.6573 | 0.4725 |
+| **Adduct-sens** | **mean±std** | | **4.117±0.400** | **1.373±0.086** | **0.9973±0.0005** | **0.9967±0.0005** | **0.9564±0.0018** | **12.473±1.594** | **3.899±0.433** | **0.9818±0.0013** | **0.7086±0.0435** | **0.5301±0.0470** |
+
+---
+
+### Testset 3 (n=298)
+
+| Split | Seed | Ckpt | Train RMSE | Train Mean%Diff | Train Pearson R | Train Spearman R | Train Kendall τ | Ext RMSE | Ext Mean%Diff | Ext Pearson R | Ext Spearman R | Ext Kendall τ |
+|-------|------|------|-----------|-----------------|-----------------|------------------|-----------------|----------|---------------|--------------|---------------|--------------|
+| Random | 0 | `experiments/outputs_lc3/full/seed_0/model.pt` | 3.406 | 1.254 | 0.9980 | 0.9974 | 0.9592 | 6.220 | 2.212 | 0.9949 | 0.9935 | 0.9375 |
+| Random | 1 | `experiments/outputs_lc3/full/seed_1/model.pt` | 2.939 | 1.010 | 0.9985 | 0.9981 | 0.9658 | 6.753 | 2.303 | 0.9945 | 0.9933 | 0.9385 |
+| Random | 2 | `experiments/outputs_lc3/full/seed_2/model.pt` | 4.121 | 1.427 | 0.9970 | 0.9962 | 0.9521 | 6.583 | 2.304 | 0.9947 | 0.9935 | 0.9354 |
+| Random | 3 | `experiments/outputs_lc3/full/seed_3/model.pt` | 3.130 | 1.096 | 0.9984 | 0.9979 | 0.9642 | 6.117 | 2.230 | 0.9951 | 0.9938 | 0.9389 |
+| Random | 4 | `experiments/outputs_lc3/full/seed_4/model.pt` | 2.837 | 0.961 | 0.9986 | 0.9982 | 0.9671 | 7.262 | 2.198 | 0.9930 | 0.9921 | 0.9380 |
+| **Random** | **mean±std** | | **3.287±0.460** | **1.150±0.171** | **0.9981±0.0006** | **0.9976±0.0007** | **0.9617±0.0055** | **6.587±0.410** | **2.249±0.045** | **0.9944±0.0007** | **0.9932±0.0006** | **0.9377±0.0012** |
+| Scaffold | 0 | `experiments/outputs_scaffold/seed_0/model.pt` | 3.270 | 1.151 | 0.9983 | 0.9977 | 0.9624 | 6.912 | 2.494 | 0.9939 | 0.9925 | 0.9324 |
+| Scaffold | 1 | `experiments/outputs_scaffold/seed_1/model.pt` | 3.803 | 1.362 | 0.9976 | 0.9966 | 0.9553 | 7.058 | 2.299 | 0.9932 | 0.9921 | 0.9339 |
+| Scaffold | 2 | `experiments/outputs_scaffold/seed_2/model.pt` | 5.447 | 1.827 | 0.9954 | 0.9949 | 0.9479 | 6.343 | 2.244 | 0.9943 | 0.9929 | 0.9337 |
+| Scaffold | 3 | `experiments/outputs_scaffold/seed_3/model.pt` | 2.695 | 0.952 | 0.9988 | 0.9985 | 0.9692 | 6.375 | 2.168 | 0.9944 | 0.9933 | 0.9382 |
+| Scaffold | 4 | `experiments/outputs_scaffold/seed_4/model.pt` | 4.004 | 1.495 | 0.9975 | 0.9966 | 0.9534 | 8.039 | 2.378 | 0.9913 | 0.9906 | 0.9307 |
+| **Scaffold** | **mean±std** | | **3.844±0.922** | **1.357±0.299** | **0.9975±0.0012** | **0.9969±0.0012** | **0.9576±0.0074** | **6.945±0.616** | **2.317±0.112** | **0.9934±0.0011** | **0.9923±0.0009** | **0.9338±0.0025** |
+| Adduct-sens | 0 | `experiments/outputs_adduct_sensitive/seed_0/model.pt` | 4.749 | 1.503 | 0.9964 | 0.9959 | 0.9536 | 7.758 | 2.609 | 0.9927 | 0.9920 | 0.9289 |
+| Adduct-sens | 1 | `experiments/outputs_adduct_sensitive/seed_1/model.pt` | 3.688 | 1.244 | 0.9978 | 0.9971 | 0.9588 | 7.074 | 2.574 | 0.9936 | 0.9928 | 0.9308 |
+| Adduct-sens | 2 | `experiments/outputs_adduct_sensitive/seed_2/model.pt` | 4.382 | 1.422 | 0.9969 | 0.9964 | 0.9563 | 7.722 | 2.603 | 0.9927 | 0.9919 | 0.9291 |
+| Adduct-sens | 3 | `experiments/outputs_adduct_sensitive/seed_3/model.pt` | 3.749 | 1.342 | 0.9978 | 0.9972 | 0.9575 | 7.664 | 2.560 | 0.9924 | 0.9919 | 0.9312 |
+| Adduct-sens | 4 | `experiments/outputs_adduct_sensitive/seed_4/model.pt` | 4.017 | 1.354 | 0.9974 | 0.9968 | 0.9556 | 7.073 | 2.416 | 0.9937 | 0.9928 | 0.9352 |
+| **Adduct-sens** | **mean±std** | | **4.117±0.400** | **1.373±0.086** | **0.9973±0.0005** | **0.9967±0.0005** | **0.9564±0.0018** | **7.458±0.316** | **2.552±0.070** | **0.9930±0.0006** | **0.9923±0.0004** | **0.9311±0.0023** |
+
+---
+
+### Testset 4 (n=20)
+
+| Split | Seed | Ckpt | Train RMSE | Train Mean%Diff | Train Pearson R | Train Spearman R | Train Kendall τ | Ext RMSE | Ext Mean%Diff | Ext Pearson R | Ext Spearman R | Ext Kendall τ |
+|-------|------|------|-----------|-----------------|-----------------|------------------|-----------------|----------|---------------|--------------|---------------|--------------|
+| Random | 0 | `experiments/outputs_lc3/full/seed_0/model.pt` | 3.406 | 1.254 | 0.9980 | 0.9974 | 0.9592 | 3.661 | 2.123 | 0.9481 | 0.9504 | 0.8421 |
+| Random | 1 | `experiments/outputs_lc3/full/seed_1/model.pt` | 2.939 | 1.010 | 0.9985 | 0.9981 | 0.9658 | 2.830 | 1.580 | 0.9677 | 0.9699 | 0.8842 |
+| Random | 2 | `experiments/outputs_lc3/full/seed_2/model.pt` | 4.121 | 1.427 | 0.9970 | 0.9962 | 0.9521 | 3.134 | 1.751 | 0.9621 | 0.9639 | 0.8737 |
+| Random | 3 | `experiments/outputs_lc3/full/seed_3/model.pt` | 3.130 | 1.096 | 0.9984 | 0.9979 | 0.9642 | 3.203 | 1.689 | 0.9617 | 0.9654 | 0.8737 |
+| Random | 4 | `experiments/outputs_lc3/full/seed_4/model.pt` | 2.837 | 0.961 | 0.9986 | 0.9982 | 0.9671 | 3.137 | 1.849 | 0.9668 | 0.9639 | 0.8632 |
+| **Random** | **mean±std** | | **3.287±0.460** | **1.150±0.171** | **0.9981±0.0006** | **0.9976±0.0007** | **0.9617±0.0055** | **3.193±0.268** | **1.798±0.184** | **0.9613±0.0070** | **0.9627±0.0065** | **0.8674±0.0143** |
+| Scaffold | 0 | `experiments/outputs_scaffold/seed_0/model.pt` | 3.270 | 1.151 | 0.9983 | 0.9977 | 0.9624 | 3.638 | 2.051 | 0.9443 | 0.9624 | 0.8632 |
+| Scaffold | 1 | `experiments/outputs_scaffold/seed_1/model.pt` | 3.803 | 1.362 | 0.9976 | 0.9966 | 0.9553 | 3.409 | 2.031 | 0.9636 | 0.9669 | 0.8842 |
+| Scaffold | 2 | `experiments/outputs_scaffold/seed_2/model.pt` | 5.447 | 1.827 | 0.9954 | 0.9949 | 0.9479 | 3.618 | 2.287 | 0.9502 | 0.9459 | 0.8211 |
+| Scaffold | 3 | `experiments/outputs_scaffold/seed_3/model.pt` | 2.695 | 0.952 | 0.9988 | 0.9985 | 0.9692 | 3.963 | 2.259 | 0.9343 | 0.9368 | 0.8000 |
+| Scaffold | 4 | `experiments/outputs_scaffold/seed_4/model.pt` | 4.004 | 1.495 | 0.9975 | 0.9966 | 0.9534 | 3.575 | 1.980 | 0.9515 | 0.9564 | 0.8526 |
+| **Scaffold** | **mean±std** | | **3.844±0.922** | **1.357±0.299** | **0.9975±0.0012** | **0.9969±0.0012** | **0.9576±0.0074** | **3.641±0.180** | **2.122±0.126** | **0.9488±0.0096** | **0.9537±0.0110** | **0.8442±0.0301** |
+| Adduct-sens | 0 | `experiments/outputs_adduct_sensitive/seed_0/model.pt` | 4.749 | 1.503 | 0.9964 | 0.9959 | 0.9536 | 3.432 | 2.117 | 0.9566 | 0.9684 | 0.8842 |
+| Adduct-sens | 1 | `experiments/outputs_adduct_sensitive/seed_1/model.pt` | 3.688 | 1.244 | 0.9978 | 0.9971 | 0.9588 | 2.833 | 1.825 | 0.9762 | 0.9744 | 0.8947 |
+| Adduct-sens | 2 | `experiments/outputs_adduct_sensitive/seed_2/model.pt` | 4.382 | 1.422 | 0.9969 | 0.9964 | 0.9563 | 3.566 | 2.277 | 0.9508 | 0.9639 | 0.8842 |
+| Adduct-sens | 3 | `experiments/outputs_adduct_sensitive/seed_3/model.pt` | 3.749 | 1.342 | 0.9978 | 0.9972 | 0.9575 | 3.402 | 2.043 | 0.9641 | 0.9579 | 0.8632 |
+| Adduct-sens | 4 | `experiments/outputs_adduct_sensitive/seed_4/model.pt` | 4.017 | 1.354 | 0.9974 | 0.9968 | 0.9556 | 3.154 | 1.867 | 0.9589 | 0.9714 | 0.8842 |
+| **Adduct-sens** | **mean±std** | | **4.117±0.400** | **1.373±0.086** | **0.9973±0.0005** | **0.9967±0.0005** | **0.9564±0.0018** | **3.278±0.259** | **2.026±0.166** | **0.9613±0.0086** | **0.9672±0.0058** | **0.8821±0.0103** |
+
+---
+
 ## Key Observations
 
 1. **Baseline (Exp 2)**: Full data (8051 samples) achieves RMSE 4.82 on held-out test, consistent across 5 seeds (±0.15). [M+Na]+ slightly harder (4.97) vs [M+H]+ (4.69).
